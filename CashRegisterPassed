@@ -1,0 +1,134 @@
+function checkCashRegister(price, cash, cid) {
+  var change = cash - price;
+  var result = {status: null, change: null };
+  var arre = getArrayOfChange(change, cid);
+  //console.log(arre);
+  var arrr = arre.reduce(
+        function(acc,curr){
+            acc.total += curr[1];
+            acc[curr[0]] = curr[1];
+            return acc;
+        },{total: 0}
+    );
+    delete arrr.total;
+  var cdd = cid.reduce(
+        function(acc, curr){
+            acc.total += curr[1];
+            acc.total = roundToTwo(acc.total);
+            acc[curr[0]] = curr[1];
+            return acc; 
+        },{total :0}
+    );
+    let totalcid = cdd.total;
+    //console.log(totalcid);
+    delete cdd.total;
+    //console.log(cdd);
+    let khra = [];
+    khra = Object.entries(arrr);
+    for(let i=0; i<khra.length;i++){
+      if(khra[i][1] === 0){
+      delete(khra[i]);
+      }
+    }
+    var khrad = khra.filter(function (el) {
+    return el != null;
+    });
+  khrad = khrad.reverse();
+    //console.log(khrad);
+  if(totalcid === change){
+    result.status = "CLOSED";
+    result.change = Object.entries(arrr);
+  }
+  else if(totalcid > change){
+    result.status ="OPEN";
+    result.change = khrad;
+  } else {
+    result.status ="INSUFFICIENT_FUNDS";
+    result.change = [];
+  }
+  for(let i=0; i<cid.length; i++){
+    if(arre[i][1] > cid[i][1]){
+      result.status = "INSUFFICIENT_FUNDS";
+      result.change = [];
+    }
+  }
+  console.log(result);
+  //console.log(khra);
+  return result;
+  //console.log(arre);
+  //console.log(cid);
+}
+function roundToTwo(num) {    
+    return +(Math.round(num + "e+2")  + "e-2");
+}
+function getArrayOfChange(totalChange, arr){
+    let arraychange = [["PENNY",0],["NICKEL",0],["DIME",0],["QUARTER",0],["ONE",0],["FIVE",0],["TEN",0],["TWENTY",0],["ONE HUNDRED",0]];
+  let hundred =0; let twenty=0; let ten=0; let five=0; let one=0; let quarter=0; let dime=0; let nickel=0; let penny = 0;
+  let p = arr[0][1]; let n = arr[1][1]; let d = arr[2][1]; let q = arr[3][1]; let o = arr[4][1]; let f = arr[5][1]; let te = arr[6][1] ; var tw = arr[7][1]; let h = arr[8][1];
+  while(totalChange >= 100 && hundred*100 < h){
+    totalChange -= 100;
+    hundred++;
+  }
+  hundred = +hundred*100;
+  arraychange[8][1]= hundred;
+  //console.log("hundred : "+hundred*100);
+  while(totalChange >= 20 && twenty*20 < tw){
+    totalChange -= 20;
+    twenty++;
+  }
+  twenty = +twenty*20;
+  arraychange[7][1]= twenty;
+  //console.log("twenty : "+twenty*20);
+  while(totalChange >= 10 && ten*10 < te){
+    totalChange -= 10;
+    ten++;
+  }
+  ten = ten*10;
+  arraychange[6][1]= ten;
+  //console.log("ten : "+ten*10);
+  while(totalChange >= 5 && five*5 < f){
+    totalChange -= 5;
+    five++;
+  }
+  five = five*5;
+  arraychange[5][1] = five;
+  //console.log("five : "+five*5);
+  while(totalChange >= 1 && one < o){
+    totalChange -= 1;
+    one++;
+  }
+  arraychange[4][1] = one;
+  //console.log("one : "+one);
+  while(totalChange >= 0.25 && quarter*0.25 < q){
+    totalChange -= 0.25;
+    quarter++;
+  }
+  quarter = quarter*0.25;
+  arraychange[3][1]= quarter;
+  //console.log("quarter : "+quarter*0.25);
+  while(totalChange >= 0.1 && dime*0.1 < d){
+    totalChange -= 0.1;
+    dime++;
+  }
+  dime = dime*0.1;
+  arraychange[2][1] = dime;
+  //console.log("dime : "+dime*0.1);
+  while(totalChange >= 0.05 && nickel*0.05 < n){
+    totalChange -= 0.05;
+    nickel++;
+  }
+  nickel = nickel*0.05;
+  arraychange[1][1] = nickel;
+  //console.log("nickel : "+nickel*0.05);
+  while(totalChange > 0 && penny*0.01 <= p){
+    totalChange -=0.01;
+    penny++;
+  }
+  penny = penny*0.01;
+  arraychange[0][1] = penny;
+  //console.log("penny : "+penny*0.01);
+  return arraychange;
+}
+
+
+checkCashRegister(19.5, 20, [["PENNY", 1.01], ["NICKEL", 2.05], ["DIME", 3.1], ["QUARTER", 4.25], ["ONE", 90], ["FIVE", 55], ["TEN", 20], ["TWENTY", 60], ["ONE HUNDRED", 100]]);
